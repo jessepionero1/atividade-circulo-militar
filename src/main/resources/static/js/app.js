@@ -1,0 +1,238 @@
+const API_ENDPOINT = '/contas';
+
+// Função para listar contas
+async function listarContas() {
+    const response = await fetch(API_ENDPOINT);
+    return response.json();
+}
+
+// Função para criar uma nova conta
+async function createContaPessoal(contaPessoal) {
+    const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contaPessoal)
+    });
+    return response;
+}
+
+// Função para obter uma conta específica
+async function getContaPessoal(id) {
+    const response = await fetch(`${API_ENDPOINT}/${id}`);
+    return response.json();
+}
+
+// Função para atualizar uma conta existente
+async function updateContaPessoal(id, contaPessoal) {
+    const response = await fetch(`${API_ENDPOINT}/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contaPessoal)
+    });
+    return response;
+}
+
+// Função para deletar uma conta
+async function deleteContaPessoal(id) {
+    const response = await fetch(`${API_ENDPOINT}/${id}`, {
+        method: 'DELETE'
+    });
+    return response;
+}
+
+let contaEmEdicao = null;
+
+// Função para editar uma conta
+async function editarConta(id) {
+    const conta = await getContaPessoal(id);
+
+    document.getElementById('nome').value = conta.nome;
+    document.getElementById('dataNascimento').value = conta.dataNascimento; // ajuste se necessário
+    document.getElementById('cpf').value = conta.cpf;
+    document.getElementById('saldoEmConta').value = parseFloat(conta.saldoEmConta).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    document.getElementById('dataUltimoSaldo').value = conta.dataUltimoSaldo; // ajuste se necessário
+
+    contaEmEdicao = conta; // Armazenando a conta que estamos editando
+}
+
+// Função para submissão do formulário
+document.getElementById('contaPessoalForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const dataUltimoSaldoValue = document.getElementById('dataUltimoSaldo').value;
+
+    const contaPessoal = {
+        nome: document.getElementById('nome').value,
+        dataNascimento: document.getElementById('dataNascimento').value,
+        cpf: document.getElementById('cpf').value,
+        saldoEmConta: parseFloat(document.getElementById('saldoEmConta').value.replace('R$', '').replace('.', '').replace(',', '.')),
+
+    };
+     // Vamos imprimir o objeto contaPessoal para verificar seu conteúdo antes de enviar
+
+      if (dataUltimoSaldoValue) {
+            contaPessoal.dataUltimoSaldo = dataUltimoSaldoValue;
+        } else {
+            contaPessoal.dataUltimoSaldo = null; // ou pode também usar `null` em vez de uma string vazia
+        }
+         console.log(contaPessoal);
+
+
+
+    try {
+        let response;
+        if (contaEmEdicao) {
+            response = await updateContaPessoal(contaEmEdicao.id, contaPessoal);
+
+        } else {
+            response = await createContaPessoal(contaPessoal);
+        }
+
+        if (response.status === 204 || response.status === 201) {
+            limparFormulario();
+             popularTabela();
+           if (contaEmEdicao) {
+               mostrarAlertaSucesso('editarSucessoAlert');
+             } else {
+               mostrarAlertaSucesso('criarSucessoAlert');
+             }
+
+        } else if (response.status === 400) {
+            const data = await response.json();
+            for (const campo in data) {
+                const mensagemErro = data[campo];
+                const errorDiv = document.getElementById(`${campo}Error`);
+                if (errorDiv) {
+                    errorDiv.textContent = mensagemErro;
+                }
+            }
+        } else {
+            const data = await response.json();
+            alert('Erro ao ' + (contaEmEdicao ? 'atualizar' : 'criar') + ' a conta. ' + (data.message || ''));
+        }
+ contaEmEdicao = null;
+
+
+    } catch (error) {
+        console.error('Erro ao processar a requisição:', error);
+    }
+});
+
+
+let lottieAnimation = null;
+
+// Função para abrir o modal de confirmação
+function abrirModalDeConfirmacao(id) {
+  const modal = new bootstrap.Modal(document.getElementById('confirmacaoModal'), {
+    backdrop: 'static', // Evita fechar o modal ao clicar fora dele
+  });
+
+    // Verifique se a animação já foi inicializada e destrua-a
+    if (lottieAnimation) {
+      lottieAnimation.destroy();
+    }
+
+  // Inicializa a animação Lottie
+  lottieAnimation = lottie.loadAnimation({
+    container: document.getElementById('lottieAnimation'),
+    renderer: 'svg',
+    loop: true, // Defina como false se você quiser que a animação seja reproduzida apenas uma vez
+    autoplay: true,
+    path: 'animation/deleteAnimated.json', // Substitua pelo caminho para o seu arquivo JSON Lottie
+  });
+
+  const confirmarDelecaoBtn = document.getElementById('confirmarDelecao');
+  confirmarDelecaoBtn.addEventListener('click', async () => {
+    try {
+      const response = await deleteContaPessoal(id);
+      if (response.status === 204) {
+        popularTabela();
+          modal.hide(); // Fecha o modal após a ação de deleção
+           mostrarAlertaSucesso('deletarSucessoAlert');
+      } else {
+        const data = await response.json();
+     // Em vez disso de usar alert
+     const errorDiv = document.getElementById('errorDiv');
+     errorDiv.textContent = 'Erro ao deletar a conta. ' + (data.message || '');
+
+      }
+    } catch (error) {
+      console.error('Erro ao deletar a conta:', error);
+    }
+    modal.hide(); // Fecha o modal após a ação de deleção
+  });
+
+  modal.show(); // Abre o modal de confirmação
+}
+
+// Função para eliminar uma conta
+async function eliminarConta(id) {
+  abrirModalDeConfirmacao(id);
+}
+
+
+// Função para listar contas na tabela
+async function popularTabela() {
+   // Mostrar o spinner
+     const spinner = document.getElementById('spinnerDiv');
+     spinner.style.display = 'block';
+
+    const tabelaBody = document.getElementById('contasTabela').querySelector('tbody');
+    tabelaBody.innerHTML = '';
+
+try {
+    const contas = await listarContas();
+    contas.forEach(conta => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${conta.nome}</td>
+            <td>${formatarDataBr(conta.dataNascimento)}</td>
+            <td>${conta.cpf}</td>
+            <td>R$ ${parseFloat(conta.saldoEmConta).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+            <td>${formatarDataBr(conta.dataUltimoSaldo)}</td>
+           <td>
+               <button type="button" class="btn btn-outline-light btn-sm" onclick="editarConta(${conta.id})"
+                   data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Conta">
+                   <i class="fa-solid fa-pen-to-square" style="color: #1c6925;"></i>
+               </button>
+               <button type="button" class="btn btn-outline-light btn-sm" onclick="eliminarConta(${conta.id})"
+                   data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Conta">
+                   <i class="fa-solid fa-trash-can" style="color: #ff0022;"></i>
+               </button>
+           </td>
+
+        `;
+        tabelaBody.appendChild(tr);
+    });
+
+
+         } catch (error) {
+                console.error('Erro ao listar as contas:', error);
+
+            }
+           setTimeout(() => {
+                  spinnerDiv.style.display = 'none';
+              }, 1000);
+}
+
+
+//tooltip
+// Inicialize os tooltips após o carregamento da página
+document.addEventListener("DOMContentLoaded", function () {
+    var tooltips = new bootstrap.Tooltip(document.body, {
+        selector: '[data-bs-toggle="tooltip"]',
+    });
+});
+
+// Chamar popularTabela() para preencher a tabela assim que a página for carregada
+window.addEventListener('load', () => {
+    popularTabela();
+});
+
+
+
+

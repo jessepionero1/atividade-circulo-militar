@@ -1,0 +1,33 @@
+:root {
+    --primary-green: #488140;
+    --light-green: #87BA6F;
+    --white-color: #FFFFFF;
+    --black-color: #000000;
+    --shadow-color: rgba(72, 129, 64, 0.15);
+    --amarelo-text-color: #FFD700;
+}
+
+.header-custom {
+    background-color: var(--primary-green) !important;
+    color: var(--amarelo-text-color) !important;
+}
+/* Defina a cor de foco personalizada */
+.form-control:focus {
+    border-color: var(--primary-green); /* Use sua cor de foco personalizada */
+    box-shadow: 0 0 0 0.25rem rgba(72, 129, 64, 0.25); /* Use a sombra personalizada se desejar */
+}
+/* botom customisado*/
+.btn-custom {
+  --bs-btn-font-weight: 600;
+  --bs-btn-color: var(--amarelo-text-color);
+  --bs-btn-bg: var(--primary-green); /* Cor de fundo do botão */
+  --bs-btn-border-color: var(--primary-green); /* Cor da borda do botão */
+  --bs-btn-hover-color: var(--bs-white);
+  --bs-btn-hover-bg: var(--light-green); /* Cor de fundo ao passar o mouse */
+  --bs-btn-hover-border-color: var(--light-green); /* Cor da borda ao passar o mouse */
+  --bs-btn-focus-shadow-rgb: var(--primary-green); /* Cor da sombra ao focar */
+  --bs-btn-active-color: var(--bs-btn-hover-color);
+  --bs-btn-active-bg: var(--light-green); /* Cor de fundo ao clicar */
+  --bs-btn-active-border-color: var(--light-green); /* Cor da borda ao clicar */
+}
+
