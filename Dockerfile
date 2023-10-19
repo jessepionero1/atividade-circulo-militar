@@ -4,6 +4,6 @@ RUN mvn clean package -DskipTests
 
 # Estágio de execução
 FROM openjdk:17.0.1-jdk-slim
-COPY --from=build /target/AtividadeApplication-0.0.1-SNAPSHOT.jar AtividadeApplication.jar
+COPY --from=build /target/atividade-0.0.1-SNAPSHOT.jar atividade.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "AtividadeApplication.jar"]
+ENTRYPOINT ["java", "-jar", "atividade.jar"]
