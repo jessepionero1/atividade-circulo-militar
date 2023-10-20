@@ -72,14 +72,14 @@ document.getElementById('contaPessoalForm').addEventListener('submit', async fun
         saldoEmConta: parseFloat(document.getElementById('saldoEmConta').value.replace('R$', '').replace('.', '').replace(',', '.')),
 
     };
-     // Vamos imprimir o objeto contaPessoal para verificar seu conteúdo antes de enviar
+
 
       if (dataUltimoSaldoValue) {
             contaPessoal.dataUltimoSaldo = dataUltimoSaldoValue;
         } else {
-            contaPessoal.dataUltimoSaldo = null; // ou pode também usar `null` em vez de uma string vazia
+            contaPessoal.dataUltimoSaldo = null;
         }
-         console.log(contaPessoal);
+
 
 
 
@@ -94,12 +94,13 @@ document.getElementById('contaPessoalForm').addEventListener('submit', async fun
 
         if (response.status === 204 || response.status === 201) {
             limparFormulario();
-             popularTabela();
+
            if (contaEmEdicao) {
                mostrarAlertaSucesso('editarSucessoAlert');
              } else {
                mostrarAlertaSucesso('criarSucessoAlert');
              }
+                popularTabela();
 
         } else if (response.status === 400) {
             const data = await response.json();
@@ -110,9 +111,6 @@ document.getElementById('contaPessoalForm').addEventListener('submit', async fun
                     errorDiv.textContent = mensagemErro;
                 }
             }
-        } else {
-            const data = await response.json();
-            alert('Erro ao ' + (contaEmEdicao ? 'atualizar' : 'criar') + ' a conta. ' + (data.message || ''));
         }
  contaEmEdicao = null;
 
@@ -155,9 +153,7 @@ function abrirModalDeConfirmacao(id) {
            mostrarAlertaSucesso('deletarSucessoAlert');
       } else {
         const data = await response.json();
-     // Em vez disso de usar alert
-     const errorDiv = document.getElementById('errorDiv');
-     errorDiv.textContent = 'Erro ao deletar a conta. ' + (data.message || '');
+
 
       }
     } catch (error) {
@@ -170,68 +166,48 @@ function abrirModalDeConfirmacao(id) {
 }
 
 // Função para eliminar uma conta
-async function eliminarConta(id) {
+function eliminarConta(id) {
   abrirModalDeConfirmacao(id);
 }
 
 
-// Função para listar contas na tabela
 async function popularTabela() {
-   // Mostrar o spinner
-     const spinner = document.getElementById('spinnerDiv');
-     spinner.style.display = 'block';
-
+    // Limpa a tabela antes de preencher com os novos dados
     const tabelaBody = document.getElementById('contasTabela').querySelector('tbody');
-    tabelaBody.innerHTML = '';
+    tabelaBody.innerHTML = ''; // Limpa os dados existentes na tabela
 
-try {
-    const contas = await listarContas();
-    contas.forEach(conta => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${conta.nome}</td>
-            <td>${formatarDataBr(conta.dataNascimento)}</td>
-            <td>${conta.cpf}</td>
-            <td>R$ ${parseFloat(conta.saldoEmConta).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-            <td>${formatarDataBr(conta.dataUltimoSaldo)}</td>
-           <td>
-               <button type="button" class="btn btn-outline-light btn-sm" onclick="editarConta(${conta.id})"
-                   data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Conta">
-                   <i class="fa-solid fa-pen-to-square" style="color: #1c6925;"></i>
-               </button>
-               <button type="button" class="btn btn-outline-light btn-sm" onclick="eliminarConta(${conta.id})"
-                   data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Conta">
-                   <i class="fa-solid fa-trash-can" style="color: #ff0022;"></i>
-               </button>
-           </td>
-
-        `;
-        tabelaBody.appendChild(tr);
-    });
+    // Mostrar o spinner
+    const spinner = document.getElementById('spinnerDiv');
+    spinner.style.display = 'block';
 
 
-         } catch (error) {
-                console.error('Erro ao listar as contas:', error);
+        const contas = await listarContas();
+        contas.forEach(conta => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${conta.nome}</td>
+                <td>${formatarDataBr(conta.dataNascimento)}</td>
+                <td>${conta.cpf}</td>
+                <td>R$ ${parseFloat(conta.saldoEmConta).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                <td>${formatarDataBr(conta.dataUltimoSaldo)}</td>
+                <td>
+                    <button type="button" class="btn btn-outline-light btn-sm" onclick="editarConta(${conta.id})"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Conta">
+                        <i class="fa-solid fa-pen-to-square" style="color: #1c6925;"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-light btn-sm" onclick="eliminarConta(${conta.id})"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Conta">
+                        <i class="fa-solid fa-trash-can" style="color: #ff0022;"></i>
+                    </button>
+                </td>
+            `;
+            tabelaBody.appendChild(tr);
+        });
 
-            }
-           setTimeout(() => {
-                  spinnerDiv.style.display = 'none';
-              }, 1000);
+
+    spinner.style.display = 'none';
 }
 
-
-//tooltip
-// Inicialize os tooltips após o carregamento da página
-document.addEventListener("DOMContentLoaded", function () {
-    var tooltips = new bootstrap.Tooltip(document.body, {
-        selector: '[data-bs-toggle="tooltip"]',
-    });
-});
-
-// Chamar popularTabela() para preencher a tabela assim que a página for carregada
-window.addEventListener('load', () => {
-    popularTabela();
-});
 
 
 

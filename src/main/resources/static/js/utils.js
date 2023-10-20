@@ -8,23 +8,21 @@ function mostrarAlertaSucesso(alertId) {
 
 
 function formatarDataBr(dataString) {
-    // Se a data for null ou uma string vazia, retorne diretamente uma string vazia
-    //console.log(dataString)
     if (dataString === null || dataString === "") {
         return "";
     }
 
     const date = new Date(dataString);
 
-    // Se a data é inválida (NaN), retorne uma string vazia
     if (isNaN(date.getTime())) {
         return "";
     }
 
-    // Se tudo estiver correto, retorne a data formatada
+    // adicionamos um dia
+    date.setDate(date.getDate() + 1);
+
     return new Intl.DateTimeFormat('pt-BR').format(date);
 }
-
 
 // limpa os campos do formulario
 function limparFormulario() {
@@ -58,3 +56,5 @@ function limparMensagensDeErro() {
 document.addEventListener('DOMContentLoaded', () => {
   limparMensagensDeErro();
 });
+
+

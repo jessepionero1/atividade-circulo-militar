@@ -50,7 +50,10 @@ public class ContaPessoalImpl implements ContaPessoalService{
 
     @Override
     @Transactional
-    public void delete(Long  id) {
-        contaPessoalRepository.deleteById(id);
+    public void delete(Long id) {
+        if(contaPessoalRepository.existsById(id)){
+            contaPessoalRepository.deleteById(id);
+        }
+
     }
 }
