@@ -8,6 +8,7 @@ public class MainController {
 
     @GetMapping({"", "/"})
     public String goIndex(){
+        System.out.println("renderiza html");
 
         return "index";
     }

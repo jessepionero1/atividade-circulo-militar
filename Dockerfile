@@ -2,6 +2,7 @@
 COPY . .
 RUN mvn clean package -DskipTests
 
+# Estágio de execução
 
 FROM openjdk:17.0.1-jdk-slim
 
