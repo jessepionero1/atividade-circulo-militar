@@ -18,7 +18,7 @@ function formatarDataBr(dataString) {
         return "";
     }
 
-    // adicionamos um dia
+
     date.setDate(date.getDate() + 1);
 
     return new Intl.DateTimeFormat('pt-BR').format(date);
@@ -33,18 +33,18 @@ function limparFormulario() {
     document.getElementById("dataUltimoSaldo").value = "";
 }
 
-// Função para limpar as mensagens de erro quando o usuário começa a digitar
+
 function limparMensagensDeErro() {
-  // Seletor para todos os campos de entrada que você deseja monitorar
+
   const camposDeEntrada = document.querySelectorAll('.form-control');
 
-  // Adicione um ouvinte de entrada a cada campo
+
   camposDeEntrada.forEach(campo => {
     campo.addEventListener('input', () => {
-      // Obtém o elemento de mensagem de erro associado ao campo
+
       const mensagemErro = document.getElementById(`${campo.id}Error`);
 
-      // Se a mensagem de erro existir e não estiver vazia, limpe-a
+
       if (mensagemErro && mensagemErro.textContent) {
         mensagemErro.textContent = '';
       }
@@ -52,9 +52,31 @@ function limparMensagensDeErro() {
   });
 }
 
+document.addEventListener('DOMContentLoaded', function() {
 // Adicione um ouvinte de evento "DOMContentLoaded" para chamar a função quando a página estiver carregada
-document.addEventListener('DOMContentLoaded', () => {
+
+
+  // Função para mostrar o alerta de sucesso
+  function mostrarAlertaSucesso(alertId) {
+      const alerta = document.getElementById(alertId);
+
+      console.log('ID:', alertId);
+      console.log('Elemento:', alerta);
+
+      if (alerta) {
+          alerta.style.display = 'block';
+          setTimeout(() => {
+              alerta.style.display = 'none';
+          }, 5000);
+      } else {
+          console.error('Elemento de alerta não encontrado:', alertId);
+      }
+  }
+
   limparMensagensDeErro();
+ console.log("Iniciando popularTabela");
+ popularTabela(); // Chame a função para popular a tabela quando a página estiver carregada
+ console.log("Finalizando popularTabela");
 });
 
 

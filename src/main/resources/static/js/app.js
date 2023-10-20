@@ -1,10 +1,30 @@
 const API_ENDPOINT = '/contas';
+const tabelaBody = document.getElementById('contasTabela').querySelector('tbody');
 
 // Função para listar contas
 async function listarContas() {
     const response = await fetch(API_ENDPOINT);
     return response.json();
 }
+
+
+async function handleDeleteConfirmationClick() {
+
+}
+
+async function refreshTabela() {
+    try {
+        // Limpeza do listener do botão confirmarDelecao antes de atualizar a tabela
+        const confirmarDelecaoBtn = document.getElementById('confirmarDelecao');
+        confirmarDelecaoBtn.removeEventListener('click', handleDeleteConfirmationClick);
+
+        // Chama popularTabela para atualizar a tabela com os dados mais recentes
+        await popularTabela();
+    } catch (error) {
+        console.error('Erro ao atualizar a tabela:', error);
+    }
+}
+
 
 // Função para criar uma nova conta
 async function createContaPessoal(contaPessoal) {
@@ -100,7 +120,7 @@ document.getElementById('contaPessoalForm').addEventListener('submit', async fun
              } else {
                mostrarAlertaSucesso('criarSucessoAlert');
              }
-                popularTabela();
+          refreshTabela();
 
         } else if (response.status === 400) {
             const data = await response.json();
@@ -148,9 +168,10 @@ function abrirModalDeConfirmacao(id) {
     try {
       const response = await deleteContaPessoal(id);
       if (response.status === 204) {
-        popularTabela();
+
           modal.hide(); // Fecha o modal após a ação de deleção
            mostrarAlertaSucesso('deletarSucessoAlert');
+           refreshTabela();
       } else {
         const data = await response.json();
 
@@ -164,6 +185,15 @@ function abrirModalDeConfirmacao(id) {
 
   modal.show(); // Abre o modal de confirmação
 }
+function mostrarAlertaSucesso(alertId) {
+    const alert = document.getElementById(alertId);
+    if (alert) {
+        alert.style.display = 'block';
+    } else {
+        console.error('Elemento com ID', alertId, 'não encontrado');
+    }
+}
+
 
 // Função para eliminar uma conta
 function eliminarConta(id) {
@@ -175,7 +205,6 @@ async function popularTabela() {
     // Limpa a tabela antes de preencher com os novos dados
     const tabelaBody = document.getElementById('contasTabela').querySelector('tbody');
     tabelaBody.innerHTML = ''; // Limpa os dados existentes na tabela
-
     // Mostrar o spinner
     const spinner = document.getElementById('spinnerDiv');
     spinner.style.display = 'block';
@@ -192,7 +221,7 @@ async function popularTabela() {
                 <td>${formatarDataBr(conta.dataUltimoSaldo)}</td>
                 <td>
                     <button type="button" class="btn btn-outline-light btn-sm" onclick="editarConta(${conta.id})"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Conta">
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Dado">
                         <i class="fa-solid fa-pen-to-square" style="color: #1c6925;"></i>
                     </button>
                     <button type="button" class="btn btn-outline-light btn-sm" onclick="eliminarConta(${conta.id})"
