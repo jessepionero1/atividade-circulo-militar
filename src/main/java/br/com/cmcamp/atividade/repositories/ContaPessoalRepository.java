@@ -12,4 +12,6 @@ public interface ContaPessoalRepository extends JpaRepository<ContaPessoal, Id> 
 
 
     Optional<ContaPessoal> findById(Long id);
+
+    void deleteById(Long id);
 }

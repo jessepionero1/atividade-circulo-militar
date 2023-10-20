@@ -15,5 +15,5 @@ public interface ContaPessoalService {
 
     List<ContaPessoal> findAll();
 
-    void delete(ContaPessoal contaPessoal);
+    void delete(Long id);
 }

@@ -11,10 +11,10 @@
     background-color: var(--primary-green) !important;
     color: var(--amarelo-text-color) !important;
 }
-/* Defina a cor de foco personalizada */
+/* Modificando a cor de bootstrap  */
 .form-control:focus {
-    border-color: var(--primary-green); /* Use sua cor de foco personalizada */
-    box-shadow: 0 0 0 0.25rem rgba(72, 129, 64, 0.25); /* Use a sombra personalizada se desejar */
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.25rem rgba(72, 129, 64, 0.25);
 }
 /* botom customisado*/
 .btn-custom {

@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(of = "id")
 public class ContaPessoal {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
 

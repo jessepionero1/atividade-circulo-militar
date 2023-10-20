@@ -63,11 +63,9 @@ public class ContaPessoalController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteContaPessoal(@PathVariable Long id) {
         Optional<ContaPessoal> contaPessoal = contaPessoalService.findById(id);
-        if (contaPessoal.isPresent()) {
-            contaPessoalService.delete(contaPessoal.get());
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        if(contaPessoal.isPresent()){
+            contaPessoalService.delete(id);
         }
+        return ResponseEntity.noContent().build();
     }
 }
