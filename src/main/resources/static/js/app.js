@@ -1,11 +1,6 @@
 const API_ENDPOINT = '/contas';
 const tabelaBody = document.getElementById('contasTabela').querySelector('tbody');
 
-// Função para listar contas
-async function listarContas() {
-    const response = await fetch(API_ENDPOINT);
-    return response.json();
-}
 
 
 async function handleDeleteConfirmationClick() {
@@ -19,7 +14,7 @@ async function refreshTabela() {
         confirmarDelecaoBtn.removeEventListener('click', handleDeleteConfirmationClick);
 
         // Chama popularTabela para atualizar a tabela com os dados mais recentes
-        await popularTabela();
+         popularTabela();
     } catch (error) {
         console.error('Erro ao atualizar a tabela:', error);
     }
@@ -201,40 +196,31 @@ function eliminarConta(id) {
 }
 
 
-async function popularTabela() {
-    // Limpa a tabela antes de preencher com os novos dados
-    const tabelaBody = document.getElementById('contasTabela').querySelector('tbody');
-    tabelaBody.innerHTML = ''; // Limpa os dados existentes na tabela
-    // Mostrar o spinner
-    const spinner = document.getElementById('spinnerDiv');
-    spinner.style.display = 'block';
+// Função para listar contas
+async function listarContas() {
+    const response = await fetch(API_ENDPOINT);
+    return response.json();
+}
 
 
-        const contas = await listarContas();
-        contas.forEach(conta => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${conta.nome}</td>
-                <td>${formatarDataBr(conta.dataNascimento)}</td>
-                <td>${conta.cpf}</td>
-                <td>R$ ${parseFloat(conta.saldoEmConta).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                <td>${formatarDataBr(conta.dataUltimoSaldo)}</td>
-                <td>
-                    <button type="button" class="btn btn-outline-light btn-sm" onclick="editarConta(${conta.id})"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Dado">
-                        <i class="fa-solid fa-pen-to-square" style="color: #1c6925;"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-light btn-sm" onclick="eliminarConta(${conta.id})"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Conta">
-                        <i class="fa-solid fa-trash-can" style="color: #ff0022;"></i>
-                    </button>
-                </td>
-            `;
-            tabelaBody.appendChild(tr);
-        });
-
-
-    spinner.style.display = 'none';
+function popularTabela() {
+    fetch(API_ENDPOINT).then(
+        (res)=>res.json()
+    ).then((response)=>{
+        var tmpData = "";
+        console.log(response);
+        response.forEach((conta)=>{
+            tmpData+="<tr>"
+            tmpData+="<td>"+conta.nome+"</td>";
+            tmpData+="<td>"+conta.dataNascimento+"</td>";
+            tmpData+="<td>"+conta.cpf+"</td>";
+            tmpData+="<td>"+conta.saldoEmConta+"</td>";
+            tmpData+="<td>"+conta.dataUltimoSaldo+"</td>";
+            tmpData+="<td><button type='button' class='btn btn-outline-light btn-sm' onclick='editarConta("+conta.id+")' data-bs-toggle='tooltip' data-bs-placement='top' title='Editar Dado'><i class='fa-solid fa-pen-to-square' style='color: #1c6925;'></i></button> <button type='button' class='btn btn-outline-light btn-sm' onclick='eliminarConta("+conta.id+")' data-bs-toggle='tooltip' data-bs-placement='top' title='Eliminar Conta'> <i class='fa-solid fa-trash-can' style='color: #ff0022;'></i></button></td>";
+            tmpData+="</tr>";
+        })
+        document.getElementById("contasTabela").innerHTML = tmpData;
+    })
 }
 
 
